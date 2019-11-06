@@ -1,6 +1,7 @@
 import numpy as np
 import re
 import os
+from sklearn import mixture
 from os import listdir
 from os.path import isfile, join
 from matplotlib import pyplot as plt
@@ -29,19 +30,23 @@ cov2 = [[5,2],[2,2]]
 d1 = np.random.multivariate_normal(mean1, cov1, 500)
 d2 = np.random.multivariate_normal(mean2, cov2, 500)
 
-mixt = 0.3*d1 + 0.7*d2
-plt.step(d1[:,0], d1[:,1],".")
-plt.step(d2[:,0], d2[:,1],".")
-# plt.show()
-plt.step(mixt[:,0], mixt[:,1],".")
+mixt = np.concatenate((d1,d2))
+print(mixt)
+
+
+#
+plt.plot(mixt[:,0], mixt[:,1],".")
+plt.show()
 
 
 plt.clf()
 data = read_data("A")
 print(data)
 plt.plot(data[:,0], data[:,1],'.')
-plt.show()
+# plt.show()
 
-            
-
-
+gmm = mixture.GaussianMixture(2,'full')
+gmm.fit(data)
+print("means : ",gmm.means_)
+print("\n")
+print("cove : ",gmm.covariances_)
