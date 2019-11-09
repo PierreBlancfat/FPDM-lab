@@ -21,6 +21,10 @@ def read_data(letter : str):
         return data
 
 
+# Preparatory work 
+
+## 2
+
 mean1 = [-3,0]
 cov1 = [[5,-2],[-2,1]]
 
@@ -31,15 +35,12 @@ d1 = np.random.multivariate_normal(mean1, cov1, 500)
 d2 = np.random.multivariate_normal(mean2, cov2, 500)
 
 mixt = np.concatenate((d1,d2))
-print(mixt)
-
-
-#
 plt.plot(mixt[:,0], mixt[:,1],".")
 plt.show()
 
 
-plt.clf()
+## 3 
+
 data = read_data("A")
 print(data)
 plt.plot(data[:,0], data[:,1],'.')
