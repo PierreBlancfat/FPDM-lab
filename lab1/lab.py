@@ -2,9 +2,12 @@ import numpy as np
 import re
 import os
 from sklearn import mixture
+from scipy import stats
 from os import listdir
 from os.path import isfile, join
 from matplotlib import pyplot as plt
+
+
 
 def read_data(letter : str):
 
@@ -41,13 +44,47 @@ plt.show()
 
 ## 3 
 
-data = read_data("A")
-print(data)
+data = read_data("")
 plt.plot(data[:,0], data[:,1],'.')
-# plt.show()
+plt.show()
 
-gmm = mixture.GaussianMixture(2,'full')
+
+
+# Data analysis: Gaussian model
+
+
+# 1
+gmm = mixture.GaussianMixture(2)
 gmm.fit(data)
 print("means : ",gmm.means_)
 print("\n")
-print("cove : ",gmm.covariances_)
+print("covs : ",gmm.covariances_)
+
+# 2
+# meshgrid
+plt.clf()
+labels = gmm.predict(data)
+x = np.linspace(-2,2,500)
+X,Y = np.meshgrid(x,x)
+pos = np.empty(X.shape + (2,))
+pos[:, :, 0] = X
+pos[:, :, 1] = Y
+# pdf
+rv = stats.multivariate_normal(gmm.means_[0],gmm.covariances_[0])
+rv2 = stats.multivariate_normal(gmm.means_[1],gmm.covariances_[1])
+# color with classification
+bool_label= list(map(bool,labels))
+inv_bool_label = [not i for i in bool_label]  
+data1 = data[bool_label]
+data2 = data[inv_bool_label]
+# plot
+plt.subplot(1,2,1)
+plt.contourf(X,Y,rv.pdf(pos))
+plt.plot(data1[:,0], data1[:,1],'.', 'r')
+plt.plot(data2[:,0], data2[:,1],'.', 'b')
+
+plt.subplot(1,2,2)
+plt.contourf(X,Y,rv2.pdf(pos))
+plt.plot(data1[:,0], data1[:,1],'.', 'r')
+plt.plot(data2[:,0], data2[:,1],'.', 'b')
+plt.show()
