@@ -39,14 +39,14 @@ d2 = np.random.multivariate_normal(mean2, cov2, 500)
 
 mixt = np.concatenate((d1,d2))
 plt.plot(mixt[:,0], mixt[:,1],".")
-plt.show()
+# plt.show()
 
 
 ## 3 
 
 data = read_data("")
 plt.plot(data[:,0], data[:,1],'.')
-plt.show()
+# plt.show()
 
 
 
@@ -87,4 +87,44 @@ plt.subplot(1,2,2)
 plt.contourf(X,Y,rv2.pdf(pos))
 plt.plot(data1[:,0], data1[:,1],'.', 'r')
 plt.plot(data2[:,0], data2[:,1],'.', 'b')
+# plt.show()
+
+# 3.1
+plt.clf()
+
+plt.hist(data[:,0],150,  density = True)
+plt.hist(data[:,1],150,  density = True)
+
+mg = stats.norm(gmm.means_[0,0], gmm.covariances_[0,0,0])
+mg2 = stats.norm(gmm.means_[0,1], gmm.covariances_[0,1,1])
+mg3 = stats.norm(gmm.means_[1,0], gmm.covariances_[1,0,0])
+mg4 = stats.norm(gmm.means_[1,1], gmm.covariances_[1,1,1])
+
+plt.plot(x,(mg.pdf(x)+mg3.pdf(x))*0.5)
+plt.plot(x,(mg2.pdf(x)+mg4.pdf(x))*0.5)
+
+# plt.show()
+
+# 3.2
+bar_num = 40
+plt.clf()
+plt.subplot(2,2,1)
+plt.hist(data1[:,0],bar_num,  density = True)
+plt.plot(x,(mg3.pdf(x)))
+
+
+plt.subplot(2,2,2)
+plt.hist(data1[:,1], bar_num,  density = True)
+plt.plot(x,(mg4.pdf(x)))
+
+
+plt.subplot(2,2,3)
+plt.hist(data2[:,0],bar_num,  density = True)
+plt.plot(x,(mg.pdf(x)))
+
+plt.subplot(2,2,4)
+plt.hist(data2[:,1],bar_num,  density = True)
+plt.plot(x,(mg2.pdf(x)))
+
+
 plt.show()
