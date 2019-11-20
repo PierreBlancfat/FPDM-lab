@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 
 def read_data(letter : str):
 
-    path = './Unistroke/Amerge.txt'
+    path = './Unistroke/'+letter+'merge.txt'
     with open(path, 'r') as f:
         nb_line = sum(1 for _ in f)
     with open(path, 'r') as f:
@@ -22,6 +22,18 @@ def read_data(letter : str):
             data[i][1] = float(line.strip().split(" ")[1])
             i+=1
         return data
+
+def read_and_merge(letter : str):
+    files = os.listdir('./Unistroke/')
+    regex = re.compile(r'^'+letter+'[0-9]')
+    files = list(filter(regex.search, files))
+    data = list()
+    for file in files:
+        with open("./Unistroke/"+file) as content: 
+            for line in content:
+                data.append((float(line.strip().split("\t")[0]),float(line.strip().split("\t")[1])))
+
+    return np.array(data)
 
 
 # Preparatory work 
@@ -48,8 +60,8 @@ plt.show()
 
 
 ## 3 
-
-data = read_data("")
+# data = read_and_merge("A")
+data = read_data("A")
 plt.figure()
 plt.plot(data[:,0], data[:,1],'.')
 plt.title('Merging of all A files after angular transformation')
@@ -105,8 +117,8 @@ axs[1].set_ylabel('y')
 fig.suptitle('classification of data points and \n gaussian pdf estimated by the EM algorithm',fontsize=15)
 fig.show()
 
-# 3.1
 
+# 3.1
 fig2, axs2 = plt.subplots(1, 2, figsize=(8, 4),constrained_layout=True)
 
 axs2[0].hist(data[:,0],150,  density = True)
