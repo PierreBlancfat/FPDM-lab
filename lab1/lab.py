@@ -9,8 +9,10 @@ from matplotlib import pyplot as plt
 from spherecluster import VonMisesFisherMixture
 
 
-def read_data(letter: str):
-    path = './Unistroke/Amerge.txt'
+
+def read_data(letter : str):
+
+    path = './Unistroke/'+letter+'merge.txt'
     with open(path, 'r') as f:
         nb_line = sum(1 for _ in f)
     with open(path, 'r') as f:
@@ -21,6 +23,18 @@ def read_data(letter: str):
             data[i][1] = float(line.strip().split(" ")[1])
             i += 1
         return data
+
+def read_and_merge(letter : str):
+    files = os.listdir('./Unistroke/')
+    regex = re.compile(r'^'+letter+'[0-9]')
+    files = list(filter(regex.search, files))
+    data = list()
+    for file in files:
+        with open("./Unistroke/"+file) as content: 
+            for line in content:
+                data.append((float(line.strip().split("\t")[0]),float(line.strip().split("\t")[1])))
+
+    return np.array(data)
 
 
 def read_data_nonAmerge(letter: str):
@@ -64,7 +78,9 @@ def mandatory_questions():
 
 def main():
     # # Preparatory work
-    # # # 2
+    #
+    # ## 2
+    #
     # mean1 = [-3, 0]
     # cov1 = [[5, -2], [-2, 1]]
     #
@@ -75,14 +91,23 @@ def main():
     # d2 = np.random.multivariate_normal(mean2, cov2, 500)
     #
     # mixt = np.concatenate((d1, d2))
+    #
     # plt.plot(mixt[:, 0], mixt[:, 1], ".")
+    # plt.title('Merging of all A files')
+    # plt.xlabel('x')
+    # plt.ylabel('y')
     # plt.show()
     #
     # ## 3
-    # data = read_data("")
+    # # data = read_and_merge("A")
+    # data = read_data("A")
+    # plt.figure()
     # plt.plot(data[:, 0], data[:, 1], '.')
-    # plt.savefig("Amerge_circle")
-
+    # plt.title('Merging of all A files after angular transformation')
+    # plt.xlabel('x')
+    # plt.ylabel('y')
+    # plt.show()
+    #
     # # Data analysis: Gaussian model
     #
     # # 1
@@ -94,7 +119,6 @@ def main():
     #
     # # 2
     # # meshgrid
-    # plt.clf()
     # labels = gmm.predict(data)
     # x = np.linspace(-2, 2, 500)
     # X, Y = np.meshgrid(x, x)
@@ -110,58 +134,84 @@ def main():
     # data1 = data[bool_label]
     # data2 = data[inv_bool_label]
     # # plot
-    # plt.subplot(1, 2, 1)
-    # plt.contourf(X, Y, rv.pdf(pos))
-    # plt.plot(data1[:, 0], data1[:, 1], '.', 'r')
-    # plt.plot(data2[:, 0], data2[:, 1], '.', 'b')
+    # fig, axs = plt.subplots(1, 2, figsize=(8, 4), constrained_layout=True)
     #
-    # plt.subplot(1, 2, 2)
-    # plt.contourf(X, Y, rv2.pdf(pos))
-    # plt.plot(data1[:, 0], data1[:, 1], '.', 'r')
-    # plt.plot(data2[:, 0], data2[:, 1], '.', 'b')
-    # # plt.show()
+    # axs[0].contourf(X, Y, rv.pdf(pos))
+    # axs[0].plot(data1[:, 0], data1[:, 1], '.', color='g')
+    # axs[0].plot(data2[:, 0], data2[:, 1], '.', color='b')
+    # axs[0].set_title('fitted distribution of blue data points')
+    # axs[0].set_xlabel('x')
+    # axs[0].set_ylabel('y')
+    #
+    # axs[1].contourf(X, Y, rv2.pdf(pos))
+    # axs[1].plot(data1[:, 0], data1[:, 1], '.', color='g')
+    # axs[1].plot(data2[:, 0], data2[:, 1], '.', color='b')
+    # axs[1].set_title('fitted distribution of green data points')
+    # axs[1].set_xlabel('x')
+    # axs[1].set_ylabel('y')
+    #
+    # fig.suptitle('classification of data points and \n gaussian pdf estimated by the EM algorithm', fontsize=15)
+    # fig.show()
     #
     # # 3.1
-    # plt.clf()
+    # fig2, axs2 = plt.subplots(1, 2, figsize=(8, 4), constrained_layout=True)
     #
-    # plt.hist(data[:, 0], 150, density=True)
-    # plt.hist(data[:, 1], 150, density=True)
-    # plt.show()
+    # axs2[0].hist(data[:, 0], 150, density=True)
+    # axs2[1].hist(data[:, 1], 150, density=True)
+    #
     # mg = stats.norm(gmm.means_[0, 0], gmm.covariances_[0, 0, 0])
     # mg2 = stats.norm(gmm.means_[0, 1], gmm.covariances_[0, 1, 1])
     # mg3 = stats.norm(gmm.means_[1, 0], gmm.covariances_[1, 0, 0])
     # mg4 = stats.norm(gmm.means_[1, 1], gmm.covariances_[1, 1, 1])
     #
-    # plt.plot(x, (mg.pdf(x) + mg3.pdf(x)) * 0.5)
-    # plt.plot(x, (mg2.pdf(x) + mg4.pdf(x)) * 0.5)
+    # axs2[0].plot(x, (mg.pdf(x) + mg3.pdf(x)) * 0.5)
+    # axs2[1].plot(x, (mg2.pdf(x) + mg4.pdf(x)) * 0.5)
+    # axs2[0].set_title('marginal along x')
+    # axs2[1].set_title('marginal along y')
     #
-    # # plt.show()
+    # axs2[0].set_xlabel('x')
+    # axs2[0].set_ylabel('density')
+    # axs2[1].set_xlabel('y')
+    # axs2[1].set_ylabel('density')
+    #
+    # fig2.suptitle('marginal histograms and marginal \n estimated gaussian mixtures', fontsize=15)
+    # fig2.show()
     #
     # # 3.2
+    #
+    # fig3, axs3 = plt.subplots(2, 2, figsize=(8, 4), constrained_layout=True)
     # bar_num = 40
-    # plt.clf()
-    # plt.subplot(2, 2, 1)
-    # plt.hist(data1[:, 0], bar_num, density=True)
-    # plt.plot(x, (mg3.pdf(x)))
+    # axs3[0][0].hist(data1[:, 0], bar_num, density=True, color='g')
+    # axs3[0][0].plot(x, (mg3.pdf(x)), color='r')
+    # axs3[0][0].set_title('marginal along x, green cluster')
     #
-    # plt.subplot(2, 2, 2)
-    # plt.hist(data1[:, 1], bar_num, density=True)
-    # plt.plot(x, (mg4.pdf(x)))
+    # axs3[0][1].hist(data1[:, 1], bar_num, density=True, color='g')
+    # axs3[0][1].plot(x, (mg4.pdf(x)), color='r')
+    # axs3[0][1].set_title('marginal along y, green cluster')
     #
-    # plt.subplot(2, 2, 3)
-    # plt.hist(data2[:, 0], bar_num, density=True)
-    # plt.plot(x, (mg.pdf(x)))
+    # axs3[1][0].hist(data2[:, 0], bar_num, density=True, color='b')
+    # axs3[1][0].plot(x, (mg.pdf(x)), color='r')
+    # axs3[1][0].set_title('marginal along x, blue cluster')
     #
-    # plt.subplot(2, 2, 4)
-    # plt.hist(data2[:, 1], bar_num, density=True)
-    # plt.plot(x, (mg2.pdf(x)))
+    # axs3[1][1].hist(data2[:, 1], bar_num, density=True, color='b')
+    # axs3[1][1].plot(x, (mg2.pdf(x)), color='r')
+    # axs3[1][1].set_title('marginal along y, blue cluster')
     #
-    # plt.show()
-
-    ## Mandatory additionnal questions
+    # axs3[0][0].set_xlabel('x')
+    # axs3[0][0].set_ylabel('density')
+    # axs3[1][0].set_xlabel('x')
+    # axs3[1][0].set_ylabel('density')
+    # axs3[0][1].set_xlabel('y')
+    # axs3[0][1].set_ylabel('density')
+    # axs3[1][1].set_xlabel('y')
+    # axs3[1][1].set_ylabel('density')
+    #
+    # fig3.suptitle('marginal estimated pdf and histogram for each cluster ', fontsize=15)
+    # fig3.show()
 
     mandatory_questions()
 
 
 if __name__ == '__main__':
     main()
+
